@@ -1,4 +1,6 @@
-* Run the script.
+*sorry i am french guy the code is a french code
+*
+*   Run the script.
 
 * The player is "X" and the bot is "O".
 
