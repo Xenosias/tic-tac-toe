@@ -1,0 +1,111 @@
+def afficher_plateau(plateau):
+    print(f"{plateau[0]} | {plateau[1]} | {plateau[2]}")
+    print("--+---+--")
+    print(f"{plateau[3]} | {plateau[4]} | {plateau[5]}")
+    print("--+---+--")
+    print(f"{plateau[6]} | {plateau[7]} | {plateau[8]}")
+
+def verifier_gagnant(plateau, joueur):
+    # Combinaisons gagnantes (lignes, colonnes, diagonales)
+    combinaisons_gagnantes = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],  # Lignes
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],  # Colonnes
+        [0, 4, 8], [2, 4, 6]              # Diagonales
+    ]
+    for combinaison in combinaisons_gagnantes:
+        if plateau[combinaison[0]] == plateau[combinaison[1]] == plateau[combinaison[2]] == joueur:
+            return True
+    return False
+
+def verifier_match_nul(plateau):
+    return all(case != " " for case in plateau)
+
+def minimax(plateau, profondeur, est_maximisant):
+    if verifier_gagnant(plateau, "O"):  # Le bot gagne
+        return 1
+    if verifier_gagnant(plateau, "X"):  # Le joueur gagne
+        return -1
+    if verifier_match_nul(plateau):  # Match nul
+        return 0
+
+    if est_maximisant:
+        meilleur_score = -float("inf")
+        for i in range(9):
+            if plateau[i] == " ":
+                plateau[i] = "O"
+                score = minimax(plateau, profondeur + 1, False)
+                plateau[i] = " "
+                meilleur_score = max(score, meilleur_score)
+        return meilleur_score
+    else:
+        meilleur_score = float("inf")
+        for i in range(9):
+            if plateau[i] == " ":
+                plateau[i] = "X"
+                score = minimax(plateau, profondeur + 1, True)
+                plateau[i] = " "
+                meilleur_score = min(score, meilleur_score)
+        return meilleur_score
+
+def meilleur_coup(plateau):
+    meilleur_score = -float("inf")
+    meilleur_coup = -1
+    for i in range(9):
+        if plateau[i] == " ":
+            plateau[i] = "O"
+            score = minimax(plateau, 0, False)
+            plateau[i] = " "
+            if score > meilleur_score:
+                meilleur_score = score
+                meilleur_coup = i
+    return meilleur_coup
+
+def morpion_contre_bot():
+
+    plateau = [" " for _ in range(9)]
+    joueur_actuel = "X"  # Le joueur commence toujours
+
+    while True:
+
+        afficher_plateau(plateau)
+
+        if joueur_actuel == "X":
+
+            try:
+                choix = int(input("Choisissez une case (1-9) : ")) - 1
+                if choix < 0 or choix > 8:
+                    print("Choix invalide. Veuillez choisir un nombre entre 1 et 9.")
+                    continue
+            except ValueError:
+                print("Entrée invalide. Veuillez entrer un nombre.")
+                continue
+
+            if plateau[choix] != " ":
+                print("Case déjà occupée. Choisissez une autre case.")
+                continue
+
+            plateau[choix] = "X"
+        else:
+         
+            print("Le bot réfléchit...")
+            coup = meilleur_coup(plateau)
+            plateau[coup] = "O"
+            print(f"Le bot a choisi la case {coup + 1}.")
+
+       
+        if verifier_gagnant(plateau, joueur_actuel):
+            afficher_plateau(plateau)
+            print(f"Le joueur {joueur_actuel} a gagné !")
+            break
+
+
+        if verifier_match_nul(plateau):
+            afficher_plateau(plateau)
+            print("Match nul !")
+            break
+
+     
+        joueur_actuel = "O" if joueur_actuel == "X" else "X"
+
+if __name__ == "__main__":
+    morpion_contre_bot()
